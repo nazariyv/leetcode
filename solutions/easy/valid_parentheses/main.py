@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from collections import defaultdict
-from leetcode.minions import Stack
+from solutions.minions import Stack
 
 left_right = {
     '(': ')',
