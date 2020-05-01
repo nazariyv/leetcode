@@ -173,3 +173,10 @@ def bisect_left(sorted_arr: List[int], target: int) -> int:
         if (sorted_arr[mid] > target): hi = mid
         else:                 lo = mid + 1
     return lo
+
+
+def find_index(l: List[T], target: T):
+    try:
+        return l.index(target)
+    except Exception:
+        return -1
