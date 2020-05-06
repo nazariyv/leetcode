@@ -1,5 +1,5 @@
-from typing import TypeVar, Optional, List, Dict, Any, Callable, Iterable
-from sortedcontainers import SortedList  # type: ignore
+from typing import TypeVar, Optional, List, Dict, Any, Callable, Iterable, Sequence, Generic
+from sortedcontainers import SortedList
 from collections import namedtuple
 import logging
 import os
@@ -14,9 +14,12 @@ Out = TypeVar('Out')
 In = TypeVar('In')
 
 
-class Stack:
-    def __init__(self): self.stack = []
-    def push(self, x: T): self.stack.append(x)
+class Stack(Generic[T]):
+    __slots__ = ('stack')
+    def __init__(self) -> None:
+        self.stack: List[T] = []
+    def push(self, x: T) -> None:
+        self.stack.append(x)
     def pop(self) -> Optional[T]:
         popped = None
         if self.stack: popped = self.stack.pop()
@@ -28,60 +31,54 @@ class Stack:
     def __len__(self) -> int: return len(self.stack)
 
 
-class Tree:
+class Tree(Generic[T]):
+    __slots__ = ('v', 'left', 'right')
     def __init__(self, v: T, left: 'Optional[Tree]' = None, right: 'Optional[Tree]' = None):
         self.v     = v
         self.left  = left
         self.right = right
-
     def repr(self, vals: Optional[List[T]] = None) -> str:
         if vals is None:
             vals = list()
         pre_ordered = self.pre_order()
-        pre_ordered = [str(x) for x in pre_ordered]
-        return f'[{" ".join(pre_ordered)}]'
-    
-    def __repr__(self):
+        str_pre_ordered = [repr(x) for x in pre_ordered]
+        return f'[{"|".join(str_pre_ordered)}]'
+    def __repr__(self) -> str:
         return self.repr()
-
-    def pre_order(self, vals: Optional[List[T]] = None):
+    def pre_order(self, vals: Optional[List[T]] = None) -> List[T]:
         if vals is None:
             vals = list()
-
         vals.append(self.v)
         if self.left is not None:
             vals.extend(self.left.pre_order())
         if self.right is not None:
             vals.extend(self.right.pre_order())
-
         return vals
 
-    def in_order(self, vals: Optional[List[T]] = None):
+    def in_order(self, vals: Optional[List[T]] = None) -> List[T]:
         if vals is None:
             vals = list()
-
         if self.left is not None:
             vals.extend(self.left.in_order())
         vals.append(self.v)
         if self.right is not None:
             vals.extend(self.right.in_order())
-
         return vals
 
 
-class ListNode:
-    def __init__(self, x = None, next = None):
+class ListNode(Generic[T]):
+    def __init__(self, x: Optional[T] = None, next: Optional['ListNode'] = None):
         self.val = x
         self.next = next
-    def __repr__(self):
+    def __repr__(self) -> str:
         stack = [str(self.val)]
         next_ = self.next
         while next_ is not None:
             stack.append(str(next_.val))
             next_ = next_.next
         return "->".join(stack)
-    def __eq__(self, other):
-        curr_self = self
+    def __eq__(self, other: Any) -> bool:
+        curr_self: Optional['ListNode'] = self
         curr_other = other
         while curr_self is not None and curr_other is not None:
             if curr_self.val != curr_other.val: return False
@@ -90,8 +87,8 @@ class ListNode:
             curr_self  = curr_self.next
             curr_other = curr_other.next
         return True
-    def __hash__(self):
-        curr_self = self
+    def __hash__(self) -> int:
+        curr_self: Optional['ListNode'] = self
         stack = []
         while curr_self is not None:
             stack.append(curr_self.val)
@@ -99,8 +96,8 @@ class ListNode:
         return hash(tuple(stack))
 
 
-def curry(func):
-    def curried(*args, **kwargs):
+def curry(func: Callable) -> Callable:
+    def curried(*args: Any, **kwargs: Any) -> Any:
         if len(args) + len(kwargs) >= func.__code__.co_argcount:
             return func(*args, **kwargs)
         return (
@@ -113,8 +110,8 @@ def curry(func):
     return curried
 
 
-def verbose(func):
-    def verbosed(*args, **kwargs):
+def verbose(func: Callable) -> Callable:
+    def verbosed(*args: Any, **kwargs: Any) -> Any:
         r = func(*args, **kwargs)
         log.debug(f"""\
 called {func.__module__}.{func.__name__} with args: {args}, \
@@ -126,7 +123,7 @@ class Style:
     class Descriptor:
         RESET = '\033[0m'
         @classmethod
-        def d(cls, color: str): return lambda s: f"{color}{s}{cls.RESET}"
+        def d(cls, color: str) -> Callable[[str], str]: return lambda s: f"{color}{s}{cls.RESET}"
 
     descriptor = Descriptor.d
 
@@ -141,7 +138,7 @@ class Style:
     UNDERLINE = descriptor('\033[4m')
 
 
-def iterable_comparator(x, y):
+def iterable_comparator(x: Sequence, y: Sequence) -> bool:
     x = SortedList(x)
     y = SortedList(y)
     if len(x) != len(y):
@@ -157,7 +154,7 @@ class TestRunner:
         self.runner = runner
         self.comparator = comparator
 
-    def __call__(self):
+    def __call__(self) -> None:
         for test in self.test_cases:
             log.debug(Style.YELLOW(f"commencing test case: {test} for {self.runner.__name__}"))
             actual = self.runner(test.case)
@@ -175,8 +172,8 @@ def bisect_left(sorted_arr: List[int], target: int) -> int:
     return lo
 
 
-def find_index(l: List[T], target: T):
+def find_index(l: List[T], target: T) -> int:
     try:
         return l.index(target)
-    except Exception:
+    except IndexError:
         return -1

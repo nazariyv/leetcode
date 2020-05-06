@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import logging
-from solutions.minions import TestCase as T, TestRunner as TR, Style
+from solutions.minions import Style
 
 log = logging.getLogger("valid_parenthesis")
 

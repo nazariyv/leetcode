@@ -2,7 +2,6 @@
 from solutions.minions import TestCase as T, TestRunner as TR
 from collections import defaultdict
 from typing import List
-from array import array
 
 from solutions.minions import verbose
 val_mapper = {1: 1, 0: -1}

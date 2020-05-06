@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-from solutions.minions import verbose
+from typing import Generator
 
-def yield_nums(s: str = "", stars = 3):
+
+def yield_nums(s: str = "", stars: int = 3) -> Generator[str, None, None]:
     if stars == 0: yield s; return
 
     while stars > 0:
