@@ -1,52 +1,67 @@
-from typing import List
+from typing import List, MutableSequence, Tuple
+from collections import deque
 
 
-class Solution:    
-    def wallsAndGates(self, rooms: List[List[int]]) -> None:
-        more_to_fill = True  # tracks if there are still more infinities that I need to fill
+INF = 2 ** 31 - 1
 
-        m, cols = len(rooms), len(rooms[0])
-        MAX = 2 ** 31 - 1
 
-        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+class Solution:
+    def identify_all_gates(self, rooms: List[List[int]], m: int, n: int) -> List[Tuple[int, int, int]]:
+        res: List[Tuple[int, int, int]] = []
+        for row in range(m):
+            for col in range(n):
+                if rooms[row][col] == 0: res.append((row, col, 0,))
+        return res
 
-        def fill(rooms: List[List[int]]) -> bool:
-            more = False
-            # try to fill as many blocks as possible
-            for row in range(m):
-                for col in range(cols):
-                    min_ = MAX
+    def wallsAndGates(self, rooms: List[List[int]]) -> List[List[int]]:
+        # I may traverse the ones that I have already traversed, to avoid this
+        # \ simply traverse it ONLY IF the new cost is LOWER than the assigned one
+        # \ else do not traverse
+        # First loop to find all gates.
+        # Next, start breadth first search from each gate (meaning look at all neighbouts)
+        # \ with a queue
+        # Once the queue is empty, you are done
 
-                    for d in directions:
-                        row_direction = row + d[0]
-                        col_direction = col + d[1]
+        # time cost is O(nm) for first loop to identify all the gates
+        # then need to traverse all of them again to determine the 
+        # path length to the nearest gate, this is O(nm) again
+        # So all in all this is O(2 * nm) = O(nm)
+        m = len(rooms)
+        n = len(rooms[0])
 
-                        if (row_direction >= 0 and row_direction < m) and (col_direction >= 0 and col_direction < cols):
-                            val = rooms[row_direction][col_direction]
+        directions = ((1, 0), (-1, 0), (0, 1), (0, -1),)
+        all_gates_prelim = self.identify_all_gates(rooms, m, n)
+        all_gates: deque = deque()
+        for gate in all_gates_prelim: all_gates.append(gate)
 
-                        if val == -1:
-                            continue
+        try:
+            while node := all_gates.popleft():
+                for d in directions:
+                    if 0 <= node[0] + d[0] < m and 0 <= node[1] + d[1] < n:
+                        # if visited, then only add if current +1 at the new node is less than the current value
+                        print(node[0] + d[0], node[1] + d[1])
+                        neighbour_val = rooms[node[0] + d[0]][node[1] + d[1]]
+                        if neighbour_val > 0 and neighbour_val != INF and neighbour_val != -1:
+                            if rooms[node[0] + d[0]][node[1] + d[1]] > node[2] + 1:
+                                rooms[node[0] + d[0]][node[1] + d[1]] = node[2] + 1
+                                all_gates.append((node[0] + d[0], node[1] + d[1], node[2] + 1,))
+                        # not visited
+                        elif rooms[node[0] + d[0]][node[1] + d[1]] == INF:
+                            rooms[node[0] + d[0]][node[1] + d[1]] = node[2] + 1
+                            all_gates.append((node[0] + d[0], node[1] + d[1], node[2] + 1,))
+        except IndexError:
+            pass
 
-                        if val >= 0 and val != MAX:
-                            min_ = min(min_, val)
-                        else:
-                            more = True
-
-                    if min_ >= 0 and min_ != MAX and rooms[row][col] != 0:
-                        rooms[row][col] = min_ + 1
-            return more
-
-        while more_to_fill: more_to_fill = fill(rooms)
-        return
+        return rooms
 
 
 if __name__ == '__main__':
-    Solution().wallsAndGates(
+    rms = Solution().wallsAndGates(
         [
-          [1, 1, 0, 2147483647],
-          [0, 1, 1, -1],
-          [1, 2, 2, -1],
-          [0, -1, 2147483647, 2147483647]
+          [INF, INF, 0,   INF],
+          [0,   INF, INF,  -1],
+          [INF, INF, INF,  -1],
+          [0,   -1,  INF, INF]
         ]
     )
     ...
