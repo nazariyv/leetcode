@@ -22,7 +22,7 @@ import time
 
 
 def isBadVersion(n: int) -> bool:
-    if n < 3:
+    if n < 2:
         return False
     return True
 
@@ -47,3 +47,4 @@ def firstBadVersion(n: int) -> int:
 
 if __name__ == '__main__':
     firstBadVersion(10)
+    ...

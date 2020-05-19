@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from typing import List
 
+
 def search_in_rotated(nums: List[int], target: int) -> int:
     n = len(nums) - 1
     start, end = 0, n
@@ -24,11 +25,11 @@ def search_in_rotated(nums: List[int], target: int) -> int:
 
 if __name__ == '__main__':
     search_in_rotated([3,1], 1)
-    # search_in_rotated([4,5,6,7,0,1,2], 0)
-    # search_in_rotated([4,5,6,7,0,1,2], 4)
-    # search_in_rotated([4,5,6,7,0,1,2], -1)
-    # search_in_rotated([3, 1], 0)
-    # search_in_rotated([3, 1], 4)
-    # search_in_rotated([3, 1], 2)
-    # search_in_rotated([5,1,3], 1)
-    # search_in_rotated([5, 1, 3], 5)
+    search_in_rotated([4,5,6,7,0,1,2], 0)
+    search_in_rotated([4,5,6,7,0,1,2], 4)
+    search_in_rotated([4,5,6,7,0,1,2], -1)
+    search_in_rotated([3, 1], 0)
+    search_in_rotated([3, 1], 4)
+    search_in_rotated([3, 1], 2)
+    search_in_rotated([5,1,3], 1)
+    search_in_rotated([5, 1, 3], 5)

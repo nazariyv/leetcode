@@ -15,7 +15,7 @@ In = TypeVar('In')
 
 
 class Stack(Generic[T]):
-    __slots__ = ('stack')
+    __slots__ = 'stack'
     def __init__(self) -> None:
         self.stack: List[T] = []
     def push(self, x: T) -> None:
@@ -29,6 +29,35 @@ class Stack(Generic[T]):
         if self.stack: topof = self.stack[-1]
         return topof
     def __len__(self) -> int: return len(self.stack)
+
+
+class Queue(Generic[T]):
+    __slots__ = ('_queue', '_head', '_tail')
+
+    def __init__(self) -> None:
+        self._queue: List[T] = []
+        self._head: Optional[T] = None
+        self._tail: Optional[T] = None
+
+    def enqueue(self, x: T) -> None:
+        self._queue.append(x)
+        self._tail = self._queue[-1]
+
+    def dequeue(self) -> Optional[T]:
+        top = None
+        if self._queue:
+            top = self._queue[0]
+            del self._queue[0]
+        self._head = None if not self._queue else self._queue[0]
+        return top
+
+    @property
+    def head(self) -> Optional[T]:
+        return self._head
+
+    @property
+    def tail(self) -> Optional[T]:
+        return self._tail
 
 
 class Tree(Generic[T]):
